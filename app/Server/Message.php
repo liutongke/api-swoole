@@ -2,7 +2,7 @@
 /*
  * User: keke
  * Date: 2018/7/26
- * Time: 16:19
+ * Time: 14:34
  *——————————————————佛祖保佑 ——————————————————
  *                   _ooOoo_
  *                  o8888888o
@@ -24,11 +24,27 @@
  *                   `=---='
  *——————————————————代码永无BUG —————————————————
  */
-//配置
-return [
-    'host' => '121.196.192.76',
-    'port' => 3306,
-    'name' => 'test',
-    'user' => 'root',
-    'pass' => '',
-];
+
+namespace chat\sw\Server;
+
+class Message implements Chat
+{
+    public function __construct()
+    {
+    }
+
+    public function Handle($ws, $frame)
+    {
+//        echo 'message';
+//        echo $frame->data;
+        //将swoole分配给用户的fd和表进行关联
+        $res = DB('chat_fd')
+            ->insert([
+                'user_id' => 1,
+                'fd' => $frame->fd
+            ]);
+        var_dump($res);
+
+        $ws->push($frame->fd, "server: {$frame->data}");
+    }
+}

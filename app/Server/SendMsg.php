@@ -1,8 +1,9 @@
 <?php
+
 /*
  * User: keke
  * Date: 2018/7/26
- * Time: 14:35
+ * Time: 14:42
  *——————————————————佛祖保佑 ——————————————————
  *                   _ooOoo_
  *                  o8888888o
@@ -25,15 +26,20 @@
  *——————————————————代码永无BUG —————————————————
  */
 
-namespace swoole;
-class Close implements Chat
+namespace chat\sw\Server;
+
+class SendMsg
 {
-    public function __construct()
+
+    private $sw;
+
+    public function __construct(Chat $wsMethod)
     {
+        $this->sw = $wsMethod;
     }
 
-    public function Handle($ws, $fd)
+    public function send($ws, $request)
     {
-        echo 'clole';
+        $this->sw->Handle($ws, $request);
     }
 }
