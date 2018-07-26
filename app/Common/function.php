@@ -24,18 +24,43 @@
  *                   `=---='
  *——————————————————代码永无BUG —————————————————
  */
-//推荐使用函数进行实例化,后续操作更加方便
-//推荐使用函数进行实例化,后续操作更加方便
+//mysql数据库
 function DB($table = 'null')
 {
     static $config;
-    if (!$config) {
-        $config = require 'config.php';
-    }
+    if (!$config)
+        $config = $GLOBALS['config'];
 
     static $_db;
-    if (!$_db) {
-        $_db = new \ninvfeng\mysql($config);
-    }
+    if (!$_db)
+        $_db = new \ninvfeng\mysql($config['mysql']);
     return $_db->table($table);
+}
+
+//Redis数据库
+function Redis()
+{
+    static $config;
+    if (!$config)
+        $config = $GLOBALS['config'];
+
+    static $redis;
+    if (!$redis)
+        $redis = new swoole\Redis($config['redis']);
+    return $redis;
+}
+
+function dd($data)
+{
+    echo '<pre />';
+    var_dump($data);
+    echo '<pre />';
+    die;
+}
+
+function dump($data)
+{
+    echo '<pre />';
+    var_dump($data);
+    echo '<pre />';
 }

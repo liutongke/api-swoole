@@ -1,9 +1,8 @@
 <?php
-
 /*
  * User: keke
  * Date: 2018/7/26
- * Time: 14:42
+ * Time: 16:19
  *——————————————————佛祖保佑 ——————————————————
  *                   _ooOoo_
  *                  o8888888o
@@ -25,21 +24,21 @@
  *                   `=---='
  *——————————————————代码永无BUG —————————————————
  */
+//配置
+return [
+    //mysql配置
+    'mysql' => [
+        'host' => '',
+        'port' => 3306,
+        'name' => '',
+        'user' => '',
+        'pass' => '',
+    ],
 
-namespace swoole;
-
-class SendMsg
-{
-
-    private $sw;
-
-    public function __construct(Chat $payMethod)
-    {
-        $this->sw = $payMethod;
-    }
-
-    public function send($ws, $request)
-    {
-        $this->sw->Handle($ws, $request);
-    }
-}
+    //redis配置
+    'redis' => [
+        'host' => '',
+        'port' => 3306,
+        'pass' => '',
+    ],
+];
