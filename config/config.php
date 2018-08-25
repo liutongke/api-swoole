@@ -28,10 +28,10 @@
 return [
     //mysql配置
     'mysql' => [
-        'host' => '',
+        'host' => '121.196.192.76',
         'port' => 3306,
-        'database_name' => '',
-        'username' => '',
+        'database_name' => 'test',
+        'username' => 'root',
         'password' => '',
         'prefix' => '',
     ],
