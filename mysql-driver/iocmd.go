@@ -41,8 +41,7 @@ type sql struct {
 }
 
 func UserInput(packetData []byte) *sql {
-	NewPacket().Handler(packetData)
-
+	//NewPacket().Handler(packetData)
 	str := InputCmd()
 	list := strings.Split(str, " ")
 	head := GetOrder(list[0])

@@ -24,23 +24,26 @@ func NewMysql(username, password string) *Mysql {
 }
 
 func main() {
+	//decodeString, err := hex.DecodeString("03646566046b656b6509626975626975626975096269756269756269750269640269640c3f000b000000030342000000")
+	//if err != nil {
+	//	return
+	//}
+	//fmt.Println(decodeString)
+	//
+	//obj := NewSelectInfo()
+	//obj.ResultSetField(decodeString)
+	//
+	//return
 	mysql := NewMysql("root", "root")
 	authPacket := mysql.ReadAuthResult()
 	mysql.write(authPacket, 1) //发送auth Packet
 	for {
-		packetLen := mysql.PayloadLen()
-
-		packetData := make([]byte, packetLen)
-		_, err := mysql.TcpConn.Read(packetData[:])
-		if err != nil {
-			panic("recv failed, err:" + err.Error())
-		}
-
+		packetData := mysql.Payload()
 		//mysql.SetChart()
-
 		fmt.Println(packetData)
-
+		NewPacket().Handler(packetData, mysql)
 		typeSql := UserInput(packetData)
+
 		mysql.Query(typeSql)
 	}
 }

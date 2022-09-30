@@ -22,6 +22,17 @@ type HandshakePacket struct {
 	AuthenticationPlugin string //身份验证方法
 }
 
+func (conn *Mysql) Payload() []byte {
+	packetLen := conn.PayloadLen()
+
+	packetData := make([]byte, packetLen)
+	_, err := conn.TcpConn.Read(packetData[:])
+	if err != nil {
+		panic("recv failed, err:" + err.Error())
+	}
+	return packetData
+}
+
 func (conn *Mysql) PayloadLen() uint32 {
 	buf := []byte{0x00, 0x00, 0x00, 0x00}
 	n, err := conn.TcpConn.Read(buf[:])
