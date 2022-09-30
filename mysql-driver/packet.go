@@ -18,20 +18,26 @@ func (p *Packet) Handler(data []byte, mysql *Mysql) {
 
 	if packetType == "00" { //成功报文
 		sucMsg := p.success(data[1:])
-		fmt.Printf("[Success] 受影响的行:%d - 自增id:%d\n", sucMsg.Row, sucMsg.LastInsertId)
+		//fmt.Printf("\033[1;32;40m%s\033[0m\n", sucMsg.Row, sucMsg.LastInsertId)
+		fmt.Printf("\u001B[1;32;40m[Success] 受影响的行:%d - 自增id:%d\u001B[0m\n", sucMsg.Row, sucMsg.LastInsertId)
 	} else if packetType == "ff" { //失败报文
 		errMsg := p.error(data[1:])
-		fmt.Printf("[Err] %d - %s\n", errMsg.ErrorCode, errMsg.ErrorMessage)
+		fmt.Printf("\u001B[1;31;40m[Err] %d - %s\u001B[0m\n", errMsg.ErrorCode, errMsg.ErrorMessage)
 	} else {
 		//fmt.Printf("field Num:%d\n", binary.LittleEndian.Uint16(append(data, 00)))
 		//本次查询总共总共多少字段
 		fieldNum := binary.LittleEndian.Uint16(append(data, 00))
 
+		fieldInfo := &FieldsInfo{
+			FieldNum:  fieldNum,
+			FieldMap:  nil,
+			FieldList: nil,
+		}
 		//读取字段
 		for i := uint16(0); i < fieldNum; i++ {
 			obj := NewSelectInfo()
 			packetData := mysql.Payload()
-			obj.ResultSetField(packetData)
+			obj.ResultSetField(packetData, fieldInfo)
 		}
 
 		NewEof().Eof(mysql.Payload())
@@ -39,16 +45,38 @@ func (p *Packet) Handler(data []byte, mysql *Mysql) {
 		//读取字段的值
 		rowObj := NewRowPacket()
 		rowObj.RowPacket(mysql)
-		//fmt.Println("rowObj----->\n", rowObj)
-		//NewEof().Eof(mysql.Payload())
+
+		var list []map[string]string
+		for k, v := range rowObj.RowList {
+			fields := make(map[string]string)
+			n := uint16(k+1) % fieldNum
+
+			fields[fieldInfo.FieldMap[n]] = v
+			list = append(list, fields)
+		}
+
+		fmt.Println("\u001B[1;32;40m+--------------------------+\u001B[0m")
+		for _, listData := range list {
+			for fieldName, fieldVal := range listData {
+				fmt.Printf("%s : %s\n", fieldName, fieldVal)
+			}
+		}
+		fmt.Println("\u001B[1;32;40m+--------------------------+\u001B[0m")
 	}
 }
+
+type FieldsInfo struct {
+	FieldNum  uint16 //几个字段
+	FieldMap  []string
+	FieldList []map[string]string
+}
+
 func NewRowPacket() *Row {
-	return &Row{}
+	return &Row{RowList: nil}
 }
 
 type Row struct {
-	RowList []interface{}
+	RowList []string
 }
 
 func (r *Row) RowPacket(mysql *Mysql) {
@@ -61,13 +89,13 @@ func (r *Row) RowPacket(mysql *Mysql) {
 		}
 
 		rowIdx = 0 //初始化一下
-		row(packetData)
+		r.row(packetData)
 	}
 }
 
 var rowIdx uint16
 
-func row(packetData []byte) {
+func (r *Row) row(packetData []byte) {
 
 	if int(rowIdx) >= len(packetData) {
 		return
@@ -84,8 +112,9 @@ func row(packetData []byte) {
 	text := packetData[rowIdx+1 : rowIdx+1+length]
 
 	rowIdx = rowIdx + 1 + length
-	fmt.Println(fmt.Sprintf("text content:%s", text))
-	row(packetData)
+
+	r.RowList = append(r.RowList, fmt.Sprintf("%s", text))
+	r.row(packetData)
 }
 
 func NewSelectInfo() *SelectInfo {
@@ -126,7 +155,7 @@ type ResultField struct {
 	OrgFieldName string //操作的物理字段名
 }
 
-func (s *SelectInfo) ResultSetField(data []byte) {
+func (s *SelectInfo) ResultSetField(data []byte, fieldsInfo *FieldsInfo) {
 	var idx uint16 = 1
 	defLen := make([]byte, 2)
 	copy(defLen, data[:idx])
@@ -180,7 +209,8 @@ func (s *SelectInfo) ResultSetField(data []byte) {
 	idx++
 	s.ResultField.OrgFieldName = string(data[idx : idx+s.ResultField.OrgFieldLen])
 
-	fmt.Println(s.ResultField.OrgFieldName)
+	fieldsInfo.FieldMap = append(fieldsInfo.FieldMap, s.ResultField.OrgFieldName)
+	//fmt.Println(s.ResultField.OrgFieldName)
 }
 
 type Success struct {
