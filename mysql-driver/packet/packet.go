@@ -1,9 +1,10 @@
-package main
+package packet
 
 import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"go-mysql/binlog/server"
 )
 
 type Packet struct {
@@ -13,7 +14,7 @@ func NewPacket() *Packet {
 	return &Packet{}
 }
 
-func (p *Packet) Handler(data []byte, mysql *Mysql) {
+func (p *Packet) Handler(data []byte, mysql *server.Mysql) {
 	packetType := hex.EncodeToString(data[:1])
 
 	if packetType == "00" { //成功报文
@@ -79,7 +80,7 @@ type Row struct {
 	RowList []string
 }
 
-func (r *Row) RowPacket(mysql *Mysql) {
+func (r *Row) RowPacket(mysql *server.Mysql) {
 	for {
 		packetData := mysql.Payload()
 

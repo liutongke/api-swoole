@@ -1,4 +1,4 @@
-package main
+package server
 
 func GetOrder(idx string) uint8 {
 	m := map[string]uint8{
