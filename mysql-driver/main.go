@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"time"
 )
 
 //var sequenceId uint8 = 1 //包序列id
@@ -34,12 +35,11 @@ func main() {
 	//rowObj.RowPacket(decodeString)
 	//return
 	mysql := NewMysql("root", "root")
+	//go PingTimer(Ping, mysql, 10*time.Second)
 	authPacket := mysql.ReadAuthResult()
 	mysql.write(authPacket, 1) //发送auth Packet
 	for {
 		packetData := mysql.Payload()
-		//mysql.SetChart()
-		fmt.Println(packetData)
 		NewPacket().Handler(packetData, mysql)
 		typeSql := UserInput()
 
@@ -57,4 +57,8 @@ func (conn *Mysql) write(data []byte, sequenceId uint8) {
 		panic("write err:" + err.Error())
 	}
 	return
+}
+
+func Ping(param interface{}) {
+	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 }

@@ -116,4 +116,5 @@ func (HandshakePacket *HandshakePacket) echo() {
 	fmt.Printf("Unused:%s\n", HandshakePacket.Unused)
 	fmt.Printf("salt2:%s\n", string(HandshakePacket.Salt2))
 	fmt.Printf("Authentication Plugin:%s\n", HandshakePacket.AuthenticationPlugin)
+	fmt.Printf("--------------------------------------------\n\n")
 }

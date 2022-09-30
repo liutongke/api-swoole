@@ -40,6 +40,7 @@ func (p *Packet) Handler(data []byte, mysql *Mysql) {
 		rowObj := NewRowPacket()
 		rowObj.RowPacket(mysql)
 		//fmt.Println("rowObj----->\n", rowObj)
+		//NewEof().Eof(mysql.Payload())
 	}
 }
 func NewRowPacket() *Row {
@@ -51,26 +52,17 @@ type Row struct {
 }
 
 func (r *Row) RowPacket(mysql *Mysql) {
-	packetData := mysql.Payload()
-	rowIdx = 0 //初始化一下
-	row(packetData)
-	//for {
-	//packetData := mysql.Payload()
-	//fmt.Println("+++++++", packetData)
-	//packetType := hex.EncodeToString(packetData[:1])
-	//if packetType == "fe" { //需要做一个eof判断是否结束
-	//	return
-	//}
-	//
-	//lengthBytes := make([]byte, 2)
-	//copy(lengthBytes, packetData[:1])
-	//length := binary.LittleEndian.Uint16(lengthBytes)
-	//
-	//text := packetData[1 : 1+length]
-	//fmt.Printf("%s", text)
-	//fmt.Println(text, length)
-	//r.RowList = append(r.RowList, text)
-	//}
+	for {
+		packetData := mysql.Payload()
+
+		packetType := hex.EncodeToString(packetData[:1])
+		if packetType == "fe" { //需要做一个eof判断是否结束
+			return
+		}
+
+		rowIdx = 0 //初始化一下
+		row(packetData)
+	}
 }
 
 var rowIdx uint16

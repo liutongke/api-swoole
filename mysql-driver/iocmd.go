@@ -43,6 +43,10 @@ type sql struct {
 func UserInput() *sql {
 	str := InputCmd()
 	list := strings.Split(str, " ")
+	if list[0] == "exit" {
+		fmt.Println("bye bye")
+		os.Exit(0)
+	}
 	head := GetOrder(list[0])
 	return &sql{
 		Sql:  str,
