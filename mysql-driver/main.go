@@ -9,6 +9,7 @@ import (
 
 func main() {
 	mysql := server.NewMysql("root", "root", "192.168.0.107", "3306")
+	//mysql := server.NewMysql("root", "REMOVED", "192.168.0.105", "3304")
 	//go PingTimer(Ping, mysql, 10*time.Second)
 
 	authPacket := packet.NewHandshake().ReadAuthResult(mysql)
