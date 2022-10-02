@@ -7,6 +7,21 @@ import (
 	"strings"
 )
 
+type InputInfo struct {
+	InputText string
+	head      uint8
+}
+
+func UserInput() *InputInfo {
+	str := InputCmd()
+	list := strings.Split(str, " ")
+	head := GetCommand(list[0])
+	return &InputInfo{
+		InputText: str,
+		head:      head,
+	}
+}
+
 func InputCmd() string {
 	f := bufio.NewReader(os.Stdin) //读取输入的内容
 	fmt.Print("mysql cli>")
@@ -21,23 +36,4 @@ func InputCmd() string {
 		str = str + string(Input[i])
 	}
 	return str
-}
-
-type sql struct {
-	Sql  string
-	head uint8
-}
-
-func UserInput() *sql {
-	str := InputCmd()
-	list := strings.Split(str, " ")
-	if list[0] == "exit" {
-		fmt.Println("bye bye")
-		os.Exit(0)
-	}
-	head := GetOrder(list[0])
-	return &sql{
-		Sql:  str,
-		head: head,
-	}
 }
