@@ -18,7 +18,8 @@ func main() {
 
 	authPacket := packet.NewHandshake().ReadAuthResult(mysql)
 	mysql.Write(authPacket, 1) //发送auth Packet
-	server.InitBinlog(mysql)   //从服务器注册
+	//server.InitBinlog(mysql)   //从服务器注册
+	//go server.PingTimer(server.Ping, mysql, 30*time.Second)
 	for {
 		packetData := mysql.Payload()
 		//fmt.Println(packetData)

@@ -83,7 +83,7 @@ func (conn *Mysql) Show() {
 func (conn *Mysql) SetSlaveUuid() {
 	var bytes = []byte{0x03}
 	uuid := uuid.New().String()
-	fmt.Printf("uuid:%s\n", uuid)
+	fmt.Printf("MySQL slave uuid:%s\n", uuid)
 
 	conn.Write(append(bytes, []byte(fmt.Sprintf("SET @slave_uuid= '%s';", uuid))...), 0)
 }

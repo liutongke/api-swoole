@@ -47,3 +47,10 @@ func (conn *Mysql) Quit() []byte {
 	os.Exit(0)
 	return nil
 }
+
+func Ping(conn *Mysql) {
+	var bytes = []byte{0x0E}
+	conn.Write(bytes, 0)
+	fmt.Println("ping")
+	return
+}

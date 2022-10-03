@@ -42,7 +42,7 @@ func (p *Packet) Handler(data []byte, mysql *server.Mysql) {
 		}
 
 		NewEof().Eof(mysql.Payload())
-		fmt.Println(fieldInfo.FieldMap)
+		//fmt.Println(fieldInfo.FieldMap)
 		//读取字段的值
 		rowObj := NewRowPacket()
 		rowObj.RowPacket(mysql)
