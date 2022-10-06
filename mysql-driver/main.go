@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-mysql/binlog/packet"
-	"go-mysql/binlog/server"
+	"go-mysql/driver/packet"
+	"go-mysql/driver/server"
 )
 
 var (
