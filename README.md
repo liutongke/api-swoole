@@ -1,3 +1,12 @@
+赞助商
+- 感谢[JetBrains](https://www.jetbrains.com/?from=api-swoole)对本项目的支持！
+
+<p align="center">
+<a herf="https://www.jetbrains.com/?from=api-swoole"> 
+<img src="https://raw.githubusercontent.com/liutongke/liutongke.github.io/master/images/yank-note-picgo-img-20221008020141.png" alt="Top Langs" height="160" />
+</a>
+</p>
+
 # **(一).开始**
 ### **1.1下载与安装**
 
