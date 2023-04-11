@@ -22,8 +22,7 @@
     },
     "files": [
       "src/function.php",
-      "src/bootstrap.php",
-      "Co/function.php"
+      "src/bootstrap.php"
     ]
   }
 }
