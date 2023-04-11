@@ -28,6 +28,8 @@
 namespace Sapi;
 
 
+use Sapi\format\Format;
+
 class Rule
 {
     //        ['engineData' => [
@@ -36,24 +38,20 @@ class Rule
 //        ];
     use Singleton;
 
-    //参数处理
-    public function getByRule($data, string $action, $rules): array
+    /**
+     * 参数处理
+     * @param array $data 请求的参数
+     * @param string $action 处理请求的方法
+     * @param array $rules 处理的规则
+     * @return array
+     */
+    public function getByRule($data, string $action, array $rules): array
     {
 
         if (!isset($rules[$action])) {
             return ["res" => false, "data" => ""];
         }
 
-        $rule = $rules[$action];
-        $t = ["res" => false, "data" => ""];
-
-        foreach ($rule as $k => $v) {
-//            var_dump($k, $v);
-            if ($v['require'] && !isset($data[$k])) {//必须滴
-                $t = ["res" => true, "data" => "must require {$k}"];
-            }
-        }
-
-        return $t;
+        return call_user_func_array([new Format(), 'Format'], [$data, $action, $rules]);
     }
 }
