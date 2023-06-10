@@ -54,4 +54,21 @@ class Rule
 
         return call_user_func_array([new Format(), 'Format'], [$data, $action, $rules]);
     }
+
+    /**
+     * 参数处理
+     * @param array $data 请求的参数
+     * @param string $action 处理请求的方法
+     * @param array $rules 处理的规则
+     * @return array
+     */
+    public function getByHttpRule(\Swoole\Http\Request $request, string $action, array $rules): array
+    {
+
+        if (!isset($rules[$action])) {
+            return ["res" => false, "data" => ""];
+        }
+
+        return call_user_func_array([new Format(), 'HttpFormat'], [$request, $action, $rules]);
+    }
 }
