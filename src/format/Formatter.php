@@ -4,5 +4,5 @@ namespace Sapi\format;
 
 interface Formatter
 {
-    public function parse($value): bool;
+    public function parse($value, array $rule): bool;
 }
