@@ -20,14 +20,14 @@ class Api
     {
     }
 
-    public function getHttpRules($data, string $action, \Swoole\Http\Request $request): array
+    public function getHttpRules(string $action, \Swoole\Http\Request $request): array
     {
         $check = $this->userCheck($request);
 
         if (!empty($check)) {
             return ["res" => true, "data" => $check];
         }
-        
+
         return Rule::getInstance()->getByHttpRule($request, $action, $this->rule());
     }
 

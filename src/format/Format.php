@@ -66,7 +66,7 @@ class Format
                 $typeAction = ucfirst($v['type']);
                 $obj = "\\Sapi\\format\\{$typeAction}Format";
 
-                if (!call_user_func([new $obj(), 'parse'], $data[$k])) {
+                if (!call_user_func_array([new $obj(), 'parse'], [$data[$k], $v])) {
                     $t = ["res" => true, "data" => 'type error'];
                 }
             }

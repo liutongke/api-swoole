@@ -66,9 +66,7 @@ class HttpRequest
             $rs->setStatus(HttpCode::$StatusOK);
 
             if (is_array($routeInfo) && method_exists($routeInfo['0'], 'getRules')) {//先处理必须携带的参数
-                $rule = $routeInfo['0']->getHttpRules(call_user_func(function ($request) {
-                    return strcmp($request->server['request_method'], 'GET') == 0 ? $request->get : $request->post;
-                }, $request), $routeInfo['1'], $request);
+                $rule = $routeInfo['0']->getHttpRules($routeInfo['1'], $request);
             }
 
             if (isset($rule['res']) && $rule['res']) {//验证未通过
