@@ -16,11 +16,22 @@ class Api
     }
 
     //定义规则,用户自定义规则
-    protected function userCheck($request)
+    protected function userCheck(\Swoole\Http\Request $request)
     {
     }
 
-    public function getRules($data, string $action, $request): array
+    public function getHttpRules($data, string $action, \Swoole\Http\Request $request): array
+    {
+        $check = $this->userCheck($request);
+
+        if (!empty($check)) {
+            return ["res" => true, "data" => $check];
+        }
+        
+        return Rule::getInstance()->getByHttpRule($request, $action, $this->rule());
+    }
+
+    public function getRules($data, string $action, \Swoole\Http\Request $request): array
     {
         $check = $this->userCheck($request);
 
