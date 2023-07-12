@@ -34,6 +34,8 @@ class HttpRequest
 {
     use Singleton;
 
+    public static array $chromeRule = ['/favicon.ico', '/favicon.png'];
+
     public function __construct()
     {
 
@@ -41,8 +43,8 @@ class HttpRequest
 
     public function handlerMsg(\Swoole\Http\Request $request, \Swoole\Http\Response $response, \Swoole\WebSocket\Server $server)
     {
-        $chromeRule = ['/favicon.ico', '/favicon.png'];
-        if (in_array($request->server['path_info'], $chromeRule) || in_array($request->server['request_uri'], $chromeRule)) {
+
+        if (in_array($request->server['path_info'], self::$chromeRule) || in_array($request->server['request_uri'], self::$chromeRule)) {
             $response->end();
             return;
         }
@@ -58,6 +60,7 @@ class HttpRequest
                 $rs->setCode(HttpCode::$StatusNotFound);
                 $rs->setData(['url not find']);
                 $rs->output();
+                $rs->end();
                 return;
             }
 
@@ -65,7 +68,7 @@ class HttpRequest
 
             $rs->setStatus(HttpCode::$StatusOK);
 
-            if (is_array($routeInfo) && method_exists($routeInfo['0'], 'getRules')) {//先处理必须携带的参数
+            if (is_array($routeInfo) && method_exists($routeInfo['0'], 'getHttpRules')) {//先处理必须携带的参数
                 $rule = $routeInfo['0']->getHttpRules($routeInfo['1'], $request);
             }
 
@@ -82,18 +85,20 @@ class HttpRequest
                     DI()->Error->errorHandler($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
                 }
             }
+            $output = $rs->output();
+            DI()->logger->echoHttpCmd($request, $response, $server, DI()->runTm->end(), $output->res);
 
-            DI()->logger->echoHttpCmd($request, $response, $server, DI()->runTm->end());
-            $rs->output();
+            $rs->end();
         } catch (\Error $e) {
             DI()->Error->errorHandler($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
 
             $rs->setStatus(HttpCode::$StatusInternalServerError);
             $rs->setCode(HttpCode::$StatusInternalServerError);
             $rs->setDebug($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
-            DI()->logger->echoHttpCmd($request, $response, $server, DI()->runTm->end(), HttpCode::$StatusInternalServerError);
+            $output = $rs->output();
+            DI()->logger->echoHttpCmd($request, $response, $server, DI()->runTm->end(), $output->res, HttpCode::$StatusInternalServerError);
 
-            $rs->output();
+            $rs->end();
         }
     }
 }

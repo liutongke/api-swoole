@@ -36,7 +36,7 @@ class CoServer
     public function __construct()
     {
         $this->initialize();
-        CheckPort::checkPort();
+//        CheckPort::checkPort();
         $this->mainServer();
         $this->addProcess();
         $a = ["udp", "tcp"];
