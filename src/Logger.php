@@ -69,7 +69,7 @@ class Logger
         }
     }
 
-    public function echoHttpCmd(\Swoole\Http\Request $request, \Swoole\Http\Response $response, \Swoole\WebSocket\Server $server, $runTime, $code = 200)
+    public function echoHttpCmd(\Swoole\Http\Request $request, \Swoole\Http\Response $response, \Swoole\WebSocket\Server $server, $runTime, $output, $code = 200)
     {
         if ($this->debug) {
             $clientInfo = $server->getClientInfo($request->fd);
@@ -77,8 +77,9 @@ class Logger
             $remoteIp = $clientInfo['remote_ip'];
 //        [GIN] 2022/08/31 - 17:59:38 | 200 |     17.2792ms |   192.168.0.105 | GET      "/"
             $requestTm = date("Y/m/d-H:i:s", $lastTime);
+            $output_data = json_encode($output);
 
-            $this->console("[http] | {$requestTm} | $remoteIp | $code | {$runTime} | {$request->server['path_info']} | {$request->server['request_method']}");
+            $this->console("[http] | request time:{$requestTm} | $remoteIp | $code | $runTime | {$request->server['path_info']} | {$request->server['request_method']} | {$output_data}");
         }
     }
 

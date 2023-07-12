@@ -31,9 +31,14 @@ class Api
         return Rule::getInstance()->getByHttpRule($request, $action, $this->rule());
     }
 
-    public function getRules($data, string $action, \Swoole\Http\Request $request): array
+    protected function userWsCheck(\Swoole\WebSocket\Frame $frame)
     {
-        $check = $this->userCheck($request);
+
+    }
+
+    public function getWsRules($data, string $action, \Swoole\WebSocket\Frame $frame): array
+    {
+        $check = $this->userWsCheck($frame);
 
         if (!empty($check)) {
             return ["res" => true, "data" => $check];
