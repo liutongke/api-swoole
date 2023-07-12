@@ -31,11 +31,12 @@ class CoServer
 {
     use Singleton;
 
-    public $server;
+    public \Swoole\WebSocket\Server $server;
 
     public function __construct()
     {
         $this->initialize();
+        CheckPort::checkPort();
         $this->mainServer();
         $this->addProcess();
         $a = ["udp", "tcp"];
@@ -44,18 +45,35 @@ class CoServer
         }
     }
 
-    public function streamServers($k, $v)
+    public function initialize()
     {
-        $stream_config = DI()->config->get("conf.{$v}");
-        if (!empty($stream_config)) {
-            $tcp_server = $this->server->listen($stream_config['host'], $stream_config['port'], $stream_config['sockType']);
+        DI()->router = router();
+        DI()->logger = Logger::getInstance(ROOT_PATH, DI()->config->get('conf.debug'));//初始化日志
+        DI()->runTm = Runtime::getInstance(DI()->config->get('conf.debug'));
+        DI()->Error = ApiError::getInstance();
+        DI()->EventsRegister = EventsRegister::getInstance();
+    }
 
-            $tcp_server->set($stream_config['settings']);
+    public function mainServer()
+    {
+        $ws_config = DI()->config->get('conf.ws');
 
-            foreach ($stream_config['events'] as $eventsInfo) {
-                $tcp_server->on($eventsInfo['0'], [new $eventsInfo['1']($this->server), $eventsInfo['2']]);
-            }
+        $this->initSwooleServer($ws_config['host'], $ws_config['port']);
+
+        if (!empty($ws_config['settings'])) {
+            $this->server->set($ws_config['settings']);
         }
+
+        foreach ($ws_config['events'] as $eventsInfo) {
+            $this->server->on($eventsInfo['0'], [new $eventsInfo['1']($this->server), $eventsInfo['2']]);
+        }
+    }
+
+    public function initSwooleServer($host, $prot)
+    {
+        //https://wiki.swoole.com/#/runtime
+        \Swoole\Coroutine::set(['hook_flags' => SWOOLE_HOOK_TCP]);
+        $this->server = new \Swoole\WebSocket\Server($host, $prot);
     }
 
     public function addProcess()
@@ -71,37 +89,20 @@ class CoServer
         }
     }
 
-    public function mainServer()
+    public function streamServers($k, $v)
     {
-        $ws_config = DI()->config->get('conf.ws');
+        $stream_config = DI()->config->get("conf.{$v}");
+        if (!empty($stream_config)) {
+            $tcp_server = $this->server->addListener($stream_config['host'], $stream_config['port'], $stream_config['sockType']);
 
-        $this->initSwooleServer($ws_config['host'], $ws_config['port']);
+            if (!empty($stream_config['settings'])) {
+                $tcp_server->set($stream_config['settings']);
+            }
 
-        if (isset($ws_config['settings']) && !empty($ws_config['settings'])) {
-            $this->server->set($ws_config['settings']);
+            foreach ($stream_config['events'] as $eventsInfo) {
+                $tcp_server->on($eventsInfo['0'], [new $eventsInfo['1']($this->server), $eventsInfo['2']]);
+            }
         }
-
-        foreach ($ws_config['events'] as $eventsInfo) {
-            $this->server->on($eventsInfo['0'], [new $eventsInfo['1']($this->server), $eventsInfo['2']]);
-        }
-    }
-
-    public function initialize()
-    {
-        DI()->router = router();
-        DI()->logger = Logger::getInstance(ROOT_PATH, DI()->config->get('conf.debug'));//初始化日志
-        DI()->runTm = Runtime::getInstance(DI()->config->get('conf.debug'));
-        DI()->Error = ApiError::getInstance();
-        DI()->EventsRegister = EventsRegister::getInstance();
-    }
-
-    const webSocketServer = 1;
-
-    public function initSwooleServer($host, $prot)
-    {
-        //https://wiki.swoole.com/#/runtime
-        \Swoole\Coroutine::set(['hook_flags' => SWOOLE_HOOK_TCP]);
-        $this->server = new \Swoole\WebSocket\Server($host, $prot);
     }
 
     public function start()
