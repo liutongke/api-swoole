@@ -37,22 +37,22 @@ php apiswoole.php
 
 ### **2.1编写一个接口**
 
-在api-swoole框架中，业务主要代码在app目录中。里面各个命名空间对应一个子目录，项目的默认命名空间是App，创建项目后app目录中包含Common、Controller、Ext三个子目录，Common目录存放函数的functions.php文件，Ext一般放置工具等。目录结构如下：
+在api-swoole框架中，业务主要代码在app目录中。里面各个命名空间对应一个子目录，项目的默认命名空间是App，创建项目后app目录中包含Common、Example、Ext三个子目录，Common目录存放函数的functions.php文件，Ext一般放置工具等。目录结构如下：
 
 ```
 ./
 └── app
-    ├── Controller # 放置接口源代码，相当于控制器层
+    ├── Example # 放置接口源代码，相当于控制器层
     ├── Common # 公共代码目录，
     └── Ext# 放置工具等
 ```
 
-当项目需要新增接口时，先在`./app/Controller`目录中新建`hello.php`文件，并用编辑器编辑代码。
+当项目需要新增接口时，先在`./app/Example`目录中新建`hello.php`文件，并用编辑器编辑代码。
 
 ```
 <?php
 
-namespace App\Controller;
+namespace App\Example;
 
 use Sapi\Api;
 
@@ -62,7 +62,10 @@ class Hello extends Api
     {
         return [
             'code' => 200,
-            'data' => 'hello world'
+            'data' => [
+                'name' => 'api-swoole',
+                'version' => DI()->config->get('conf.version'),
+            ],
         ];
     }
 }
@@ -75,7 +78,7 @@ class Hello extends Api
 
 ```
 return [
-    \HttpRouter("/hello", "App\Controller\Hello@index"),
+    \HttpRouter("/hello", "App\Example\Hello@index"),
 ];
 ```
 
@@ -107,12 +110,16 @@ php apiswoole.php
 
 ```json
 {
-  "code": 200,
-  "msg": "success",
-  "data": {
     "code": 200,
-    "data": "hello world"
-  }
+    "msg": "success",
+    "data": {
+        "code": 200,
+        "data": {
+            "name": "api-swoole",
+            "version": "1.0.2"
+        }
+    },
+    "debug": []
 }
 ```
 
@@ -158,33 +165,35 @@ server {
 ```
 <?php
 return [
-    'debug' => true,//true 调试模式 false 关闭调试
+    'version' => '1.0.2',
+    'debug' => true,//调试模式
     'log' => [
-        'displayConsole' => true,//控制台打印日志，true打开 false 关闭
-        'saveLog' => true,//保存日志 true 打开 false 关闭
+        'displayConsole' => true,//true控制台打印日志
+        'saveLog' => true,//保存日志
     ],
     'udp' => [
-        'host' => '0.0.0.0',//指定监听的ip地址
-        'port' => 9502,//指定监听端口
-        'sockType' => SWOOLE_SOCK_UDP,//指定这组 Server 的类型
+        'host' => '0.0.0.0',
+        'port' => 9502,
+        'sockType' => SWOOLE_SOCK_UDP,
         'events' => [
-            ['packet', \App\Controller\UdpServe::class, 'onPacket'],//回调事件
+            ['packet', \App\Example\UdpServe::class, 'onPacket'],
         ],
-        'settings' => [],//配置选项https://wiki.swoole.com/#/server/setting
+        'settings' => [],
     ],
     'tcp' => [
-        'host' => '0.0.0.0',//指定监听的ip地址
-        'port' => 9501,//指定监听端口
-        'sockType' => SWOOLE_SOCK_TCP,//指定这组 Server 的类型
+        'host' => '0.0.0.0',
+        'port' => 9501,
+        'sockType' => SWOOLE_SOCK_TCP,
         'events' => [
-            ['receive', \App\Controller\TcpServe::class, 'onReceive'],//回调事件
+            ['Receive', \App\Example\TcpServe::class, 'onReceive'],
+            ['connect', \App\Example\TcpServe::class, 'onConnect'],
+            ['close', \App\Example\TcpServe::class, 'onClose'],
         ],
-        'settings' => [],//配置选项https://wiki.swoole.com/#/server/setting
+        'settings' => [],
     ],
     'ws' => [
-        'host' => '0.0.0.0',//指定监听的ip地址
-        'port' => 9500,//指定监听端口
-        'sockType' => SWOOLE_SOCK_TCP,//指定这组 Server 的类型
+        'host' => '0.0.0.0',
+        'port' => 9500,
         'events' => [
             ['open', \Sapi\Events::class, 'onOpen'],
             ['message', \Sapi\Events::class, 'onMessage'],
@@ -194,9 +203,10 @@ return [
             ['Finish', \Sapi\Events::class, 'onFinish'],
             ['workerStart', \Sapi\Events::class, 'onWorkerStart'],
             ['start', \Sapi\Events::class, 'onStart'],
-        ],//回调事件
+        ],
         'settings' => [
             'daemonize' => false,//设置 daemonize => true 时，程序将转入后台作为守护进程运行。长时间运行的服务器端程序必须启用此项。如果不启用守护进程，当 ssh 终端退出后，程序将被终止运行
+//            'dispatch_mode' => 2,//数据包分发策略。【默认值：2】
             'worker_num' => swoole_cpu_num(),
             'log_file' => 'storage/swoole',
             'log_rotation' => SWOOLE_LOG_ROTATION_DAILY,
@@ -204,11 +214,23 @@ return [
             'log_level' => SWOOLE_LOG_DEBUG,
             'task_worker_num' => 10,
             'enable_coroutine' => true,//是否启用异步风格服务器的协程支持
+//            'buffer_output_size' => 32 * 1024 * 1024, //配置发送输出缓存区内存尺寸。【默认值：2M】
+//            'document_root' => ROOT_PATH,
+//            'enable_static_handler' => true,//开启静态文件请求处理功能
+//            'static_handler_locations' => ['/chatroom', '/app/images'],//设置静态处理器的路径。类型为数组，默认不启用。
         ],
-    ],//配置选项https://wiki.swoole.com/#/websocket_server?id=%e9%80%89%e9%a1%b9
+
+//        SWOOLE_LOG_DEBUG	调试日志，仅作为内核开发调试使用
+//        SWOOLE_LOG_TRACE	跟踪日志，可用于跟踪系统问题，调试日志是经过精心设置的，会携带关键性信息
+//        SWOOLE_LOG_INFO	普通信息，仅作为信息展示
+//        SWOOLE_LOG_NOTICE	提示信息，系统可能存在某些行为，如重启、关闭
+//        SWOOLE_LOG_WARNING	警告信息，系统可能存在某些问题
+//        SWOOLE_LOG_ERROR	错误信息，系统发生了某些关键性的错误，需要即时解决
+//        SWOOLE_LOG_NONE	相当于关闭日志信息，日志信息不会抛出
+    ],
     'process' => [
-        [\App\Controller\Process::class, 'addProcess']
-    ],//添加用户自定义的工作进程 https://wiki.swoole.com/#/server/methods?id=addprocess
+        [\App\Example\Process::class, 'addProcess']
+    ],//添加用户自定义的工作进程
 ];
 ```
 
@@ -344,8 +366,8 @@ HTTP 服务器的路由构建文件位于`./route/http.php`中。声明具体的
 
 ```
 return [
-    \HttpRouter("/", "App\Controller\App@Index"),
-    \HttpRouter("/hello", "App\Controller\Hello@index"),
+    \HttpRouter("/", "App\Example\App@Index"),
+    \HttpRouter("/hello", "App\Example\Hello@index"),
     \HttpRouter("声明浏览器地址", "命名空间+类@类中的方法"),
 ];
 ```
@@ -356,10 +378,15 @@ return [
 
 ```
 return [
-    \HttpRouter("/start", function (\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
+    \HttpRouter("/", function (\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
         return [
-            'code' => 200,
-            'data' => 'hello world'
+            "code" => 200,
+            "msg" => "hello World!",
+            'tm' => date('Y-m-d H:i:s'),
+            "data" => [
+                'name' => 'api-swoole',
+                'version' => DI()->config->get('conf.version'),
+            ],
         ];
     }),
 ];
@@ -395,36 +422,55 @@ class Hello extends Api
 
 * 一维下标是接口类的方法名。
 * 二维下标是接口参数名称。
-* 三维下标`name`对应客户端传入的值，下标`require`表示值传入可选项,`true`必须传入，`false`非必须传入。
+* 三维下标
+    1. `name`对应客户端传入的值
+    2. `require`表示值传入可选项,`true`必须传入，`false`非必须传入。
+    3. `type`传入类型，支持`int`、`string`、`float`、`bool`、`array`、`file`
+    4. `source`参数传入位置，支持`get`、`post`、`header`
+    5. `message`接口参数提示信息
 
 ```
 <?php
 
-namespace App\Controller;
+namespace App\Example;
 
 use Sapi\Api;
 
-class Auth extends Api
+//字段验证
+class App extends Api
 {
-
     public function rule()
     {
         return [
-            'login' => [
-                'username' => ['name' => 'username', 'require' => true]
+            'Index' => [
+                'intValue' => ['name' => 'intValue', 'require' => true, 'type' => 'int', 'source' => 'post', 'message' => 'intValue必须携带'],
+                'stringValue' => ['name' => 'stringValue', 'require' => true, 'type' => 'string', 'source' => 'post', 'message' => 'stringValue必须携带'],
+                'floatValue' => ['name' => 'floatValue', 'require' => true, 'type' => 'float', 'source' => 'post', 'message' => 'floatValue是必须的'],
+                'boolValue' => ['name' => 'boolValue', 'require' => true, 'type' => 'bool', 'source' => 'post', 'message' => 'boolValue是必须的'],
+                'arrayValue' => ['name' => 'arrayValue', 'require' => true, 'type' => 'array', 'source' => 'post', 'message' => 'arrayValue是必须的'],
+                'file' => ['name' => 'file', 'require' => false, 'type' => 'file', 'ext' => 'jpeg,png,txt', 'source' => 'post', 'message' => 'file文件是必须的'],
+                'x-token' => ['name' => 'x-token', 'require' => true, 'type' => 'string', 'source' => 'header', 'message' => '缺少请求头x-token'],
             ]
         ];
     }
 
-    public function login(\Swoole\Http\Request $request, \Swoole\Http\Response $response): array
+    public function Index(\Swoole\Http\Request $request, \Swoole\Http\Response $response): array
     {
-
         return [
             "code" => 200,
-            "msg" => "login",
+            "msg" => "hello World!",
+            'tm' => date('Y-m-d H:i:s'),
             "data" => [
-                'username' => $request->post['username']
-            ]
+                'name' => 'api-swoole',
+                'version' => DI()->config->get('conf.version'),
+                'intValue' => $request->post['intValue'],
+                'stringValue' => $request->post['stringValue'],
+                'floatValue' => $request->post['floatValue'],
+                'boolValue' => $request->post['boolValue'],
+                'arrayValue' => $request->post['arrayValue'],
+                'x-token' => $request->header['x-token'],
+                'file' => saveFile($request, './tmp/')
+            ],
         ];
     }
 }
@@ -437,8 +483,8 @@ websocket服务器的路由定义文件位于`./route/websocket.php`
 
 ```
 return [
-    WsRouter("/", "\App\Controller\Websocket@index"),
-    WsRouter("/login", "\App\Controller\Websocket@login"),
+    WsRouter("/", "\App\Example\Websocket@index"),
+    WsRouter("/login", "\App\Example\Websocket@login"),
 ];
 ```
 
@@ -473,19 +519,19 @@ return [
 ```
 <?php
 
-namespace App\Controller;
+namespace App\Example;
 
 use Sapi\Api;
 
-class Websocket extends Api
+class WebsocketHello extends Api
 {
-    public function index(\Swoole\WebSocket\Server $server, array $msg): array
+    public function hello(\Swoole\WebSocket\Server $server, array $msg): array
     {
         return [
             'err' => 200,
             'data' => [
                 'name' => 'api-swoole',
-                'version' => '1.0.0',
+                'version' => DI()->config->get('conf.version'),
             ]
         ];
     }
@@ -498,32 +544,44 @@ class Websocket extends Api
 
 * 一维下标是接口类的方法名。
 * 二维下标是接口参数名称。
-* 三维下标`name`对应客户端传入的值，下标`require`表示值传入可选项,`true`必须传入，`false`非必须传入。
-
+* 三维下标
+    1. `name`对应客户端传入的值
+    2. `require`表示值传入可选项,`true`必须传入，`false`非必须传入。
+    3. `type`传入类型，支持`int`、`string`、`float`、`bool`、`array`
+    4. `message`接口参数提示信息
 ```
 <?php
 
-namespace App\Controller;
+namespace App\Example;
 
-use Sapi\Api;
-
-class Websocket extends Api
+class Websocket extends WsBase
 {
     public function rule()
     {
         return [
-            'login' => [
-                'username' => ['name' => 'username', 'require' => true]
+            'Index' => [
+                'intValue' => ['name' => 'intValue', 'require' => true, 'type' => 'int', 'message' => 'intValue必须携带'],
+                'stringValue' => ['name' => 'stringValue', 'require' => true, 'type' => 'string', 'message' => 'stringValue必须携带'],
+                'floatValue' => ['name' => 'floatValue', 'require' => true, 'type' => 'float', 'message' => 'floatValue是必须的'],
+                'boolValue' => ['name' => 'boolValue', 'require' => true, 'type' => 'bool', 'message' => 'boolValue是必须的'],
+                'arrayValue' => ['name' => 'arrayValue', 'require' => true, 'type' => 'array', 'message' => 'arrayValue是必须的'],
+                'x-token' => ['name' => 'x-token', 'require' => true, 'type' => 'string', 'message' => '缺少请求头x-token'],
             ]
         ];
     }
 
-    public function login(\Swoole\WebSocket\Server $server, array $msg): array
+
+    public function Index(\Swoole\WebSocket\Server $server, array $msg): array
     {
         return [
             'err' => 200,
             'data' => [
-                'username' => $msg['username'],
+                'intValue' => $msg['intValue'],
+                'stringValue' => $msg['stringValue'],
+                'floatValue' => $msg['floatValue'],
+                'boolValue' => $msg['boolValue'],
+                'arrayValue' => $msg['arrayValue'],
+                'x-token' => $msg['x-token'],
             ]
         ];
     }
@@ -531,49 +589,47 @@ class Websocket extends Api
 }
 ```
 
-### **6.8http/websocket勾子函数**
+### **6.8http勾子函数**
 
-`Api`类内置了钩子函数`userCheck`,HTTP/websocket控制器均可继承`Api`类重载。例如可完成用户身份验证。
+`Api`类内置了钩子函数`userCheck`,HTTP控制器均可继承`Api`类重载。例如可完成用户身份验证。
 
-首先定义声明`Base.php`文件。
+首先定义声明`HttpBase.php`文件。
 
 ```
 <?php
 
-namespace App\Controller;
+namespace App\Example;
 
 use Sapi\Api;
 
-class Base extends Api
+class HttpBase extends Api
 {
     //用户权限验证
-    public function userCheck()
+    public function userCheck(\Swoole\Http\Request $request): string
     {
-        if (true) {
+        if ($request->header["x-token"] != "123123") {
             return "token过期";
         }
+        return "";
     }
-
 }
 ```
 
-然后继承`Base.php`实现类重载，。
+然后继承`HttpBase.php`实现类重载，。
 
 ```
 <?php
 
-namespace App\Controller;
+namespace App\Example;
 
-use Sapi\Api;
-
-class Auth extends Base
+class Auth extends HttpBase
 {
 
     public function rule()
     {
         return [
             'login' => [
-                'username' => ['name' => 'username', 'require' => true]
+                'username' => ['name' => 'username', 'require' => true, 'type' => 'string', 'source' => 'post', 'message' => '必须携带username'],
             ]
         ];
     }
@@ -588,6 +644,75 @@ class Auth extends Base
             ]
         ];
     }
+}
+```
+
+### **6.9websocket勾子函数**
+
+`Api`类内置了钩子函数`userWsCheck`,websocket控制器均可继承`Api`类重载。例如可完成用户身份验证。
+
+首先定义声明`WsBase.php`文件。
+
+```
+<?php
+
+namespace App\Example;
+
+use Sapi\Api;
+
+class WsBase extends Api
+{
+    public function userWsCheck(\Swoole\WebSocket\Frame $frame): string
+    {
+        $res = json_decode($frame->data, true);
+
+        if (!isset($res['data']["x-token"]) || $res['data']["x-token"] != "123123") {
+            return "token expired";
+        }
+        return "";
+    }
+}
+```
+
+然后继承`WsBase.php`实现类重载，。
+
+```
+<?php
+
+namespace App\Example;
+
+class Websocket extends WsBase
+{
+    public function rule()
+    {
+        return [
+            'Index' => [
+                'intValue' => ['name' => 'intValue', 'require' => true, 'type' => 'int', 'message' => 'intValue必须携带'],
+                'stringValue' => ['name' => 'stringValue', 'require' => true, 'type' => 'string', 'message' => 'stringValue必须携带'],
+                'floatValue' => ['name' => 'floatValue', 'require' => true, 'type' => 'float', 'message' => 'floatValue是必须的'],
+                'boolValue' => ['name' => 'boolValue', 'require' => true, 'type' => 'bool', 'message' => 'boolValue是必须的'],
+                'arrayValue' => ['name' => 'arrayValue', 'require' => true, 'type' => 'array', 'message' => 'arrayValue是必须的'],
+                'x-token' => ['name' => 'x-token', 'require' => true, 'type' => 'string', 'message' => '缺少请求头x-token'],
+            ]
+        ];
+    }
+
+
+    public function Index(\Swoole\WebSocket\Server $server, array $msg): array
+    {
+        return [
+            'err' => 200,
+            'data' => [
+                'intValue' => $msg['intValue'],
+                'stringValue' => $msg['stringValue'],
+                'floatValue' => $msg['floatValue'],
+                'boolValue' => $msg['boolValue'],
+                'arrayValue' => $msg['arrayValue'],
+                'x-token' => $msg['x-token'],
+            ]
+        ];
+    }
+
 }
 ```
 
