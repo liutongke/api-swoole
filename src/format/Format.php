@@ -67,7 +67,7 @@ class Format
                 $obj = "\\Sapi\\format\\{$typeAction}Format";
 
                 if (!call_user_func_array([new $obj(), 'parse'], [$data[$k], $v])) {
-                    $t = ["res" => true, "data" => 'Receive unspecified data type'];
+                    $t = ["res" => true, "data" => "{$obj} Receive unspecified data type"];
                 }
             }
         }

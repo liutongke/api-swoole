@@ -36,7 +36,6 @@ class CoServer
     public function __construct()
     {
         $this->initialize();
-//        CheckPort::checkPort();
         $this->mainServer();
         $this->addProcess();
         $a = ["udp", "tcp"];
@@ -93,14 +92,19 @@ class CoServer
     {
         $stream_config = DI()->config->get("conf.{$v}");
         if (!empty($stream_config)) {
-            $tcp_server = $this->server->addListener($stream_config['host'], $stream_config['port'], $stream_config['sockType']);
+            $stream_server = $this->server->addListener($stream_config['host'], $stream_config['port'], $stream_config['sockType']);
+
+            if (!$stream_server) {
+                Logger::echoErrCmd("Port {$stream_config['port']} is occupied");
+                exit();
+            }
 
             if (!empty($stream_config['settings'])) {
-                $tcp_server->set($stream_config['settings']);
+                $stream_server->set($stream_config['settings']);
             }
 
             foreach ($stream_config['events'] as $eventsInfo) {
-                $tcp_server->on($eventsInfo['0'], [new $eventsInfo['1']($this->server), $eventsInfo['2']]);
+                $stream_server->on($eventsInfo['0'], [new $eventsInfo['1']($this->server), $eventsInfo['2']]);
             }
         }
     }

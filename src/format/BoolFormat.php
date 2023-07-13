@@ -6,7 +6,10 @@ class BoolFormat
 {
     public function parse($val, $rule): bool
     {
-        // TODO: Implement parse() method.
-        return is_bool($val);
+        if ($val === "true" || $val === "false") {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
