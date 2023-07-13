@@ -52,7 +52,7 @@ class Rule
             return ["res" => false, "data" => ""];
         }
 
-        return call_user_func_array([new Format(), 'Format'], [$data, $action, $rules]);
+        return call_user_func_array([new Format(), 'WsFormat'], [$data, $action, $rules]);
     }
 
     /**

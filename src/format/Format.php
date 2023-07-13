@@ -11,7 +11,7 @@ class Format
      * @param array $rules 处理的规则
      * @return array
      */
-    public function Format($data, string $action, array $rules)
+    public function WsFormat($data, string $action, array $rules)
     {
 
         $rule = $rules[$action];
@@ -26,8 +26,8 @@ class Format
                 $typeAction = ucfirst($v['type']);
                 $obj = "\\Sapi\\format\\{$typeAction}Format";
 
-                if (!call_user_func([new $obj(), 'parse'], $data[$k])) {
-                    $t = ["res" => true, "data" => 'Receive unspecified data type'];
+                if (!call_user_func_array([new $obj(), 'parse'], [$data[$k], $v])) {
+                    $t = ["res" => true, "data" => "{$obj} Receive unspecified data type"];
                 }
             }
         }
