@@ -58,7 +58,7 @@ class HttpRequest
             if (!isset($setUrlList[$pathUrl])) {
                 $rs->setStatus(HttpCode::$StatusNotFound);
                 $rs->setCode(HttpCode::$StatusNotFound);
-                $rs->setData(['url not find']);
+                $rs->setData(['url does not exist']);
                 $rs->output();
                 $rs->end();
                 return;
