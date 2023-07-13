@@ -92,16 +92,16 @@ class CoServer
     {
         $stream_config = DI()->config->get("conf.{$v}");
         if (!empty($stream_config)) {
-            $stream_server = $this->server->addListener($stream_config['host'], $stream_config['port'], $stream_config['sockType']);
+            $stream_server = $this->server->addlistener($stream_config['host'], $stream_config['port'], $stream_config['sockType']);
 
             if (!$stream_server) {
                 Logger::echoErrCmd("Port {$stream_config['port']} is occupied");
                 exit();
             }
 
-            if (!empty($stream_config['settings'])) {
-                $stream_server->set($stream_config['settings']);
-            }
+//            https://wiki.swoole.com/#/server/events?id=onreceive
+//            当主服务器设置了协议后，额外监听的端口默认会继承主服务器的设置。需要显式调用 set 方法来重新设置端口的协议。
+            $stream_server->set($stream_config['settings']);
 
             foreach ($stream_config['events'] as $eventsInfo) {
                 $stream_server->on($eventsInfo['0'], [new $eventsInfo['1']($this->server), $eventsInfo['2']]);

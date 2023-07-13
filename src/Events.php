@@ -37,9 +37,6 @@ class Events
 
     public function onOpen(\Swoole\WebSocket\Server $server, $request)
     {
-        if (DI()->config->get('conf.debug')) {
-            echo "server: handshake success with fd{$request->fd}\n";
-        }
         DI()->EventsRegister->run(EventsName::$onOpen, $server, $request);;
     }
 
@@ -110,12 +107,12 @@ EOL. "\n";
         Logger::echoSuccessCmd("Swoole websocket Server running：ws://{$server->host}:{$server->port}");
 
         $tcp_config = DI()->config->get('conf.tcp');
-        if (isset($tcp_config) && isset($tcp_config)) {
+        if (isset($tcp_config)) {
             Logger::echoSuccessCmd("Swoole tcp Server running：{$tcp_config['host']}:{$tcp_config['port']}");
         }
 
         $udp_config = DI()->config->get('conf.udp');
-        if (isset($udp_config) && isset($udp_config)) {
+        if (isset($udp_config)) {
             Logger::echoSuccessCmd("Swoole udp Server running：{$udp_config['host']}:{$udp_config['port']}");
         }
     }
