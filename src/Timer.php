@@ -2,6 +2,8 @@
 
 namespace Sapi;
 
+use InvalidArgumentException;
+
 class Timer
 {
     private static function t(): int
@@ -40,6 +42,27 @@ class Timer
     }
 
     /**
+     * @desc 返回当前时间的微秒
+     * @return string
+     */
+    public static function getMicroseconds(): string
+    {
+        list($usec, $sec) = explode(' ', microtime());
+
+        return intval(sprintf('%.0f', (floatval($usec) + floatval($sec)) * 1000 * 1000));
+    }
+
+    /**
+     * @desc 返回当前时间的毫秒
+     * @return string
+     */
+    public static function getMilliseconds(): string
+    {
+        list($usec, $sec) = explode(' ', microtime());
+        return intval(sprintf('%.0f', (floatval($usec) + floatval($sec)) * 1000));
+    }
+
+    /**
      * @desc 获取今天的零点时间戳，例如：今天是2023-8-1的话获取的则是2023-8-1号的零点时间戳
      * @return int
      */
@@ -73,5 +96,26 @@ class Timer
         $remainingSeconds = $midnight - $currentTime;
 
         return $remainingSeconds;
+    }
+
+    /**
+     * @desc 根据需要输入的小时生成对应的时间
+     * @param int $hour 0-23输入需要生成小时
+     * @return int
+     */
+    public static function getTimestampForHourOfDay(int $hour): int
+    {
+        if ($hour < 0 || $hour > 23) {
+            throw new InvalidArgumentException("Hour must be between 0 and 23.");
+        }
+
+        // 获取当前日期
+        $currentDate = date('Y-m-d');
+
+        // 拼接日期和指定小时，生成字符串表示
+        $dateTimeString = $currentDate . ' ' . $hour . ':00:00';
+
+        // 将日期时间字符串转换成时间戳
+        return strtotime($dateTimeString);
     }
 }
