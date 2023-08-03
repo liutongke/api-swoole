@@ -118,4 +118,29 @@ class Timer
         // 将日期时间字符串转换成时间戳
         return strtotime($dateTimeString);
     }
+
+    /**
+     * @desc 根据给定的小时H生成对应的Ymd时间，例如：输入23，当前时间大于等于23且小于23则生成他们之间的零点的Ymd时间
+     * @param int $hour
+     * @return string
+     */
+    public static function generateYmdForHourOfDay(int $hour): string
+    {
+        if ($hour < 0 || $hour > 23) {
+            throw new InvalidArgumentException("Hour must be between 0 and 23.");
+        }
+        
+        $currentDate = new \DateTime(); // 当前日期时间
+
+        $currentHour = (int)$currentDate->format('G'); // 当前小时
+
+        if ($hour <= $currentHour) {
+            // 如果给定小时小于等于当前小时，则为明天
+            $currentDate->modify('+1 day');
+        }
+
+        $currentDate->setTime($hour, 0, 0); // 设置指定小时的时间
+
+        return $currentDate->format('Ymd');
+    }
 }
