@@ -11,6 +11,15 @@ class Timer
         return time();
     }
 
+    /**
+     * @desc 获取格式化后当前时间：2023-08-04 00:28:24
+     * @return string
+     */
+    public static function getNowStr(): string
+    {
+        $currentTime = self::t();
+        return date("Y-m-d H:i:s", $currentTime);
+    }
 
     /**
      * @desc 返回当前时间的日期id
@@ -129,7 +138,7 @@ class Timer
         if ($hour < 0 || $hour > 23) {
             throw new InvalidArgumentException("Hour must be between 0 and 23.");
         }
-        
+
         $currentDate = new \DateTime(); // 当前日期时间
 
         $currentHour = (int)$currentDate->format('G'); // 当前小时
