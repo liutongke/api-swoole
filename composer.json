@@ -14,7 +14,8 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=7.4",
-    "ext-swoole": ">=4.5.2"
+    "ext-swoole": ">=4.5.2",
+    "ext-openssl": "*"
   },
   "autoload": {
     "psr-4": {
