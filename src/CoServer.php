@@ -51,6 +51,7 @@ class CoServer
         DI()->runTm = Runtime::getInstance(DI()->config->get('conf.debug'));
         DI()->Error = ApiError::getInstance();
         DI()->EventsRegister = EventsRegister::getInstance();
+        DI()->table = Table::getInstance();
     }
 
     public function mainServer()
