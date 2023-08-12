@@ -6,7 +6,7 @@ class Table
 {
     use Singleton;
 
-    private \Swoole\Table $table;
+    private static \Swoole\Table $table;
 
     public function __construct()
     {
@@ -32,9 +32,9 @@ class Table
         }
 
         $table->create();
-        $this->table = $table;
+        self::$table = $table;
 
-        return $this->table;
+        return self::$table;
     }
 
     /**
@@ -42,9 +42,9 @@ class Table
      *
      * @return int 最大行数
      */
-    public function getSize(): int
+    public static function getSize(): int
     {
-        return $this->table->size;
+        return self::$table->size;
     }
 
     /**
@@ -52,9 +52,9 @@ class Table
      *
      * @return int 内存尺寸（字节）
      */
-    public function getMemorySize(): int
+    public static function getMemorySize(): int
     {
-        return $this->table->memorySize;
+        return self::$table->memorySize;
     }
 
     /**
@@ -64,9 +64,9 @@ class Table
      * @param array $value 数据的 value
      * @return bool
      */
-    public function set(string $key, array $value): bool
+    public static function set(string $key, array $value): bool
     {
-        return $this->table->set($key, $value);
+        return self::$table->set($key, $value);
     }
 
     /**
@@ -75,12 +75,9 @@ class Table
      * @param string|null $field
      * @return array|false
      */
-    public function getAll(string $key, string $field = null): array|false
+    public static function getAll(string $key): array|false
     {
-        if (is_null($field)) {
-            return $this->table->get($key);
-        }
-        return $this->table->get($key, $field);
+        return self::$table->get($key);
     }
 
     /**
@@ -89,9 +86,9 @@ class Table
      * @param string|null $field 当指定了 $field 时仅返回该字段的值，而不是整个记录
      * @return string|false
      */
-    public function get(string $key, string $field = null): string|false
+    public static function get(string $key, string $field = null): string|false
     {
-        return $this->getAll($key, $field);
+        return self::$table->get($key, $field);
     }
 
     /**
@@ -99,18 +96,18 @@ class Table
      * @param string $key 数据的 key【必须为字符串类型】
      * @return bool
      */
-    public function exist(string $key): bool
+    public static function exist(string $key): bool
     {
-        return $this->table->exist($key);
+        return self::$table->exist($key);
     }
 
     /**
      *返回 table 中存在的条目数。
      * @return int
      */
-    public function count(): int
+    public static function count(): int
     {
-        return $this->table->count();
+        return self::$table->count();
     }
 
     /**
@@ -118,19 +115,18 @@ class Table
      * @param string $key $key 对应的数据不存在，将返回 false
      * @return bool
      */
-    public function del(string $key): bool
+    public static function del(string $key): bool
     {
-        return $this->table->del($key);
+        return self::$table->del($key);
     }
 
     /**
      * 获取 Swoole\Table 状态。
      * @return array
      */
-    public function stats(): array
+    public static function stats(): array
     {
-        // Swoole 版本 >= v4.8.0 可用
-        return $this->table->stats();
+        return self::$table->stats();
     }
 
     /**
@@ -140,9 +136,9 @@ class Table
      * @param int|float $incrby 默认值：1 ,增量 【如果列为 int，$incrby 必须为 int 型，如果列为 float 型，$incrby 必须为 float 类型】
      * @return int|float
      */
-    public function incr(string $key, string $column, int|float $incrby = 1): int|float
+    public static function incr(string $key, string $column, int|float $incrby = 1): int|float
     {
-        return $this->table->incr($key, $column, $incrby);
+        return self::$table->incr($key, $column, $incrby);
     }
 
     /**
@@ -152,8 +148,8 @@ class Table
      * @param int|float $decrby 默认值：1 ,增量 【如果列为 int，$decrby 必须为 int 型，如果列为 float 型，$decrby 必须为 float 类型】
      * @return int|float
      */
-    public function decr(string $key, string $column, int|float $decrby = 1): int|float
+    public static function decr(string $key, string $column, int|float $decrby = 1): int|float
     {
-        return $this->table->decr($key, $column, $decrby);
+        return self::$table->decr($key, $column, $decrby);
     }
 }
