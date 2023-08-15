@@ -5,11 +5,11 @@ namespace Sapi\Cache;
 interface Cache
 {
 
-    public function set($key, $value, $expire = 600);
+    public function set(string $key, string $value, $expire = 600);
 
 
-    public function get($key);
+    public function get(string $key);
 
 
-    public function delete($key);
+    public function delete(string $key);
 }
