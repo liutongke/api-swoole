@@ -82,11 +82,18 @@ class Logger
             $clientInfo = $server->getClientInfo($request->fd);
             $lastTime = $clientInfo['last_time'];
             $remoteIp = $clientInfo['remote_ip'];
+            
 //        [GIN] 2022/08/31 - 17:59:38 | 200 |     17.2792ms |   192.168.0.105 | GET      "/"
             $requestTm = date("Y/m/d-H:i:s", $lastTime);
             $output_data = json_encode($output);
 
-            $this->console("[http] | request time:{$requestTm} | $remoteIp | $code | $runTime | {$request->server['path_info']} | {$request->server['request_method']} | {$output_data}");
+            if ($request->server['request_method'] === 'GET') {
+                $requestData = json_encode($request->get);
+            } else {
+                $requestData = json_encode($request->post);
+            }
+
+            $this->console("[http] | request time:{$requestTm} | $remoteIp | $code | $runTime | {$request->server['path_info']} | {$request->server['request_method']} | request data:{$requestData} | output data:{$output_data}");
         }
     }
 
