@@ -32,11 +32,11 @@ class Logger
 {
     use Singleton;
 
-    private $logFolder;
-    private $debug;
-    private $logConf;
+    private string $logFolder;
+    private bool $debug;
+    private array $logConf;
 
-    public function __construct($logDir, $debug)
+    public function __construct(string $logDir, bool $debug)
     {
         $this->logConf = DI()->config->get('conf.log');
         $this->logFolder = "{$logDir}storage/log";
@@ -47,14 +47,21 @@ class Logger
         }
     }
 
-    public static function echoSuccessCmd($msg)
-    {
-        echo "[Success] \033[32m{$msg}\033[0m\n";
-    }
+    public static string $success = 'Success';
+    public static string $error = 'ERROR';
 
-    public static function echoErrCmd($msg)
+    public static function echoMessage(string $msg, string $colorCode = null)
     {
-        echo "[ERROR] \033[31m{$msg}\033[0m\n";
+        $colors = [
+            self::$success => 32, // 绿色
+            self::$error => 31,   // 红色
+        ];
+
+        if ($colorCode && isset($colors[$colorCode])) {
+            echo "[{$colorCode}] \033[{$colors[$colorCode]}m{$msg}\033[0m\n";
+        } else {
+            echo "[Info] {$msg}\n";
+        }
     }
 
     public function echoWsCmd(\Swoole\WebSocket\Server $server, $fd, $runTime, $data, $code = 200)
@@ -93,14 +100,16 @@ class Logger
         }
     }
 
-    public function log($msg, $logLevel)
+    public function log($msg, $logLevel): string
     {
         $prefix = date('Ymd');
         $date = date('Y-m-d H:i:s');
         $levelStr = $this->levelMap($logLevel);
-        $filePath = $this->logFolder . "/{$prefix}_{$levelStr}.log";
-        $logData = "[swoole] | [{$date}] | {$levelStr} |  {$msg}" . PHP_EOL;
+        $filePath = "{$this->logFolder}/{$prefix}_{$levelStr}.log";
+        $logData = "[swoole] | [{$date}] | {$levelStr} | {$msg}" . PHP_EOL;
+
         file_put_contents($filePath, "{$logData}", FILE_APPEND | LOCK_EX);
+
         return $logData;
     }
 
@@ -119,7 +128,7 @@ class Logger
         $this->log($msg, self::LOG_LEVEL_NOTICE);
     }
 
-    public function waring($msg)
+    public function warning($msg)
     {
         $this->log($msg, self::LOG_LEVEL_WARNING);
     }
@@ -135,21 +144,16 @@ class Logger
     const LOG_LEVEL_WARNING = 3;
     const LOG_LEVEL_ERROR = 4;
 
-    private function levelMap($level)
+    private function levelMap($level): string
     {
-        switch ($level) {
-            case self::LOG_LEVEL_DEBUG:
-                return 'debug';
-            case self::LOG_LEVEL_INFO:
-                return 'info';
-            case self::LOG_LEVEL_NOTICE:
-                return 'notice';
-            case self::LOG_LEVEL_WARNING:
-                return 'warning';
-            case self::LOG_LEVEL_ERROR:
-                return 'error';
-            default:
-                return 'unknown';
-        }
+        $levels = [
+            self::LOG_LEVEL_DEBUG => 'debug',
+            self::LOG_LEVEL_INFO => 'info',
+            self::LOG_LEVEL_NOTICE => 'notice',
+            self::LOG_LEVEL_WARNING => 'warning',
+            self::LOG_LEVEL_ERROR => 'error',
+        ];
+
+        return $levels[$level] ?? 'unknown';
     }
 }
