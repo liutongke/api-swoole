@@ -102,18 +102,17 @@ EOL. "\n";
         $phpVersion = phpversion();
         $swooleVersion = SWOOLE_VERSION;
 
-        Logger::echoSuccessCmd("Swoole: {$swooleVersion}, PHP: {$phpVersion}, Port: {$server->port}");
-        Logger::echoSuccessCmd("Swoole Http Server running：http://{$server->host}:{$server->port}");
-        Logger::echoSuccessCmd("Swoole websocket Server running：ws://{$server->host}:{$server->port}");
-
+        Logger::echoMessage("Swoole: {$swooleVersion}, PHP: {$phpVersion}, Port: {$server->port}", Logger::$success);
+        Logger::echoMessage("Swoole Http Server running：http://{$server->host}:{$server->port}", Logger::$success);
+        Logger::echoMessage("Swoole websocket Server running：ws://{$server->host}:{$server->port}", Logger::$success);
         $tcp_config = DI()->config->get('conf.tcp');
         if (isset($tcp_config)) {
-            Logger::echoSuccessCmd("Swoole tcp Server running：{$tcp_config['host']}:{$tcp_config['port']}");
+            Logger::echoMessage("Swoole tcp Server running：{$tcp_config['host']}:{$tcp_config['port']}", Logger::$success);
         }
 
         $udp_config = DI()->config->get('conf.udp');
         if (isset($udp_config)) {
-            Logger::echoSuccessCmd("Swoole udp Server running：{$udp_config['host']}:{$udp_config['port']}");
+            Logger::echoMessage("Swoole udp Server running：{$udp_config['host']}:{$udp_config['port']}", Logger::$success);
         }
     }
 }
