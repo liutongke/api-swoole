@@ -32,26 +32,35 @@ class Runtime
 {
     use Singleton;
 
-    private $tm;
-    private $debug;
+    private float $startTime; // 修改成员属性名，提高可读性
+    private bool $debug;
 
-    function __construct(bool $debug)
+    public function __construct(bool $debug)
     {
         $this->debug = $debug;
+        $this->startTime = 0; // 初始化开始时间
     }
 
+    /**
+     * 记录开始时间
+     */
     public function start()
     {
         if ($this->debug) {
-            $this->tm = microtime(true);
+            $this->startTime = microtime(true);
         }
     }
 
-    public function end()
+    /**
+     * 计算并返回运行时间
+     *
+     * @return string 运行时间，单位：毫秒
+     */
+    public function end(): string
     {
         if ($this->debug) {
-            $endTm = microtime(true);
-            $runTime = ($endTm - $this->tm) * 1000;
+            $endTime = microtime(true);
+            $runTime = ($endTime - $this->startTime) * 1000;
             return round($runTime, 3) . "ms";
         }
         return "0";

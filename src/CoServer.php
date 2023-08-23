@@ -96,7 +96,7 @@ class CoServer
             $stream_server = $this->server->addlistener($stream_config['host'], $stream_config['port'], $stream_config['sockType']);
 
             if (!$stream_server) {
-                Logger::echoErrCmd("Port {$stream_config['port']} is occupied");
+                Logger::echoMessage("Port {$stream_config['port']} is occupied", Logger::$error);
                 exit();
             }
 
