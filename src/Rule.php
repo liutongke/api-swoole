@@ -28,7 +28,7 @@
 namespace Sapi;
 
 
-use Sapi\format\Format;
+use Sapi\Format\Format;
 
 class Rule
 {

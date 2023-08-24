@@ -1,6 +1,6 @@
 <?php
 
-namespace Sapi\format;
+namespace Sapi\Format;
 
 class Format
 {

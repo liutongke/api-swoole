@@ -1,6 +1,6 @@
 <?php
 
-namespace Sapi\format;
+namespace Sapi\Format;
 
 class FileFormat
 {
@@ -47,7 +47,7 @@ class FileFormat
         if (!isset($rule['ext'])) {
             return true;
         }
-        
+
         if (is_string($rule['ext'])) {
             $ext = explode(",", $rule['ext']);
         } else {
