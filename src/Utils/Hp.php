@@ -58,6 +58,7 @@ class Hp
 
         $hp = min($hp, self::MAX_HP);
         $hpData['num'] = $hp;
+        $hpData['last_tm'] = time() - $remainder_tm;
         $this->setHpData($hpData);
     }
 
