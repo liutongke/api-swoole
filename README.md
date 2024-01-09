@@ -292,7 +292,7 @@ DI()->config->get('conf.tcp') #返回数组
 * **info**： 业务纪录类日记
 * **debug**： 开发调试类日记
 * **notice**： 系统提示类日记
-* **waring**： 系统致命类日记
+* **warning**： 系统致命类日记
 
 日志系统使用：
 
@@ -300,7 +300,7 @@ DI()->config->get('conf.tcp') #返回数组
 DI()->logger->debug("日志测试debug");  #开发调试类日记
 DI()->logger->info("日志测试info");    #业务纪录类日记
 DI()->logger->notice("日志测试notice");#系统提示类日记
-DI()->logger->waring("日志测试waring");#系统致命类日记
+DI()->logger->warning("日志测试warning");#系统致命类日记
 DI()->logger->error("日志测试error");  #系统异常类日记
 ```
 
@@ -310,7 +310,7 @@ DI()->logger->error("日志测试error");  #系统异常类日记
 [swoole] | [2022-09-06 01:32:05] | debug |  日志测试debug
 [swoole] | [2022-09-06 01:32:05] | info |  日志测试info
 [swoole] | [2022-09-06 01:32:05] | notice |  日志测试notice
-[swoole] | [2022-09-06 01:32:05] | warning |  日志测试waring
+[swoole] | [2022-09-06 01:32:05] | warning |  日志测试warning
 [swoole] | [2022-09-06 01:32:05] | error |  日志测试error
 ```
 

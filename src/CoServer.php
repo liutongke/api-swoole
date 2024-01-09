@@ -53,7 +53,7 @@ class CoServer
         DI()->EventsRegister = EventsRegister::getInstance();
         DI()->table = Table::getInstance();
     }
-
+ 
     public function mainServer()
     {
         $ws_config = DI()->config->get('conf.ws');

@@ -97,6 +97,7 @@ class HttpResponse
 
         if (DI()->config->get('conf.debug')) {
             $this->res['debug'] = $this->debug;
+            $this->res['version'] = DI()->config->get('conf.version');
         }
 
         return $this;
