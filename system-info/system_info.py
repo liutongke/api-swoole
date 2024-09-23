@@ -875,22 +875,22 @@ def GetFullSystemData() -> dict:
 
 cpuConstants = CpuConstants()
 
-if __name__ == '__main__':
-    '''
-        打印系统信息
-
-        Returns
-        -------
-        None
-        '''
-    print("系统信息: ", GetSystemInfo())  # 打印系统信息
-    print("CPU信息: ", GetCpuInfo())  # 打印CPU信息
-    print("CPU常量信息: ", GetCpuConstants())  # 打印CPU常量信息
-    print("内存信息: ", GetMemInfo())  # 打印内存信息
-    print("磁盘信息: ", GetDiskInfo())  # 打印磁盘信息
-    print("网络信息: ", GetNetWork())  # 打印网络信息
-    print("系统负载状态: ", GetLoadAverage())  # 打印系统负载状态
-    print("IO读写信息: ", GetIoReadWrite())  # 打印IO读写信息
-    print("操作系统版本: ", GetSystemVersion())  # 打印操作系统版本
-    print("系统启动时间: ", GetBootTime())  # 打印系统启动时间
-    print("完整的系统信息: ", GetFullSystemData())  # 打印完全的系统信息
+# if __name__ == '__main__':
+#     '''
+#         打印系统信息
+#
+#         Returns
+#         -------
+#         None
+#         '''
+#     print("系统信息: ", GetSystemInfo())  # 打印系统信息
+#     print("CPU信息: ", GetCpuInfo())  # 打印CPU信息
+#     print("CPU常量信息: ", GetCpuConstants())  # 打印CPU常量信息
+#     print("内存信息: ", GetMemInfo())  # 打印内存信息
+#     print("磁盘信息: ", GetDiskInfo())  # 打印磁盘信息
+#     print("网络信息: ", GetNetWork())  # 打印网络信息
+#     print("系统负载状态: ", GetLoadAverage())  # 打印系统负载状态
+#     print("IO读写信息: ", GetIoReadWrite())  # 打印IO读写信息
+#     print("操作系统版本: ", GetSystemVersion())  # 打印操作系统版本
+#     print("系统启动时间: ", GetBootTime())  # 打印系统启动时间
+#     print("完整的系统信息: ", GetFullSystemData())  # 打印完全的系统信息
